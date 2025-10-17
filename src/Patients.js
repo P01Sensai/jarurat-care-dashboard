@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
 
-
 const PatientCard = ({ patient, onViewDetails }) => (
   <div className="patient-card">
     <h3>{patient.name}</h3>
@@ -13,6 +12,7 @@ const PatientCard = ({ patient, onViewDetails }) => (
   </div>
 );
 
+
 const PatientModal = ({ patient, onClose }) => (
   <div className="modal-overlay" onClick={onClose}>
     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -22,11 +22,11 @@ const PatientModal = ({ patient, onClose }) => (
       <p><strong>Contact:</strong> {patient.phone}</p>
       <p><strong>Age:</strong> {patient.age}</p>
       <p><strong>Address:</strong> {`${patient.address.street}, ${patient.address.suite}, ${patient.address.city}, ${patient.address.zipcode}`}</p>
-      <p><strong>Website:</strong> {patient.website}</p>
       <p><strong>Company:</strong> {patient.company.name}</p>
     </div>
   </div>
 );
+
 
 const AddPatientModal = ({ onClose, onAddPatient }) => {
     const [name, setName] = useState('');
@@ -41,7 +41,6 @@ const AddPatientModal = ({ onClose, onAddPatient }) => {
             return;
         }
         
-        
         const newPatient = {
             id: Date.now(), 
             name,
@@ -49,7 +48,6 @@ const AddPatientModal = ({ onClose, onAddPatient }) => {
             phone: contact,
             email,
             address: { street: 'N/A', suite: '', city: '', zipcode: '' },
-            website: 'N/A',
             company: { name: 'N/A' }
         };
 
@@ -78,8 +76,6 @@ const AddPatientModal = ({ onClose, onAddPatient }) => {
 };
 
 
-
-
 const PatientsPage = () => {
   const [patients, setPatients] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -91,16 +87,17 @@ const PatientsPage = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch('https://jsonplaceholder.typicode.com/users');
+        const response = await fetch('https://jsonplaceholder.typicode.com/users?_limit=4');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
        
-        const patientsWithAge = data.map(patient => ({
+        const patientsWithAge = data.map(({ website, ...patient }) => ({
           ...patient,
           age: Math.floor(Math.random() * (70 - 20 + 1)) + 20, 
         }));
+
         setPatients(patientsWithAge);
       } catch (err) {
         setError(err.message);
@@ -163,8 +160,8 @@ const PatientsPage = () => {
       
       {isAddModalOpen && (
         <AddPatientModal 
-            onClose={() => setAddModalOpen(false)}
-            onAddPatient={handleAddPatient}
+          onClose={() => setAddModalOpen(false)}
+          onAddPatient={handleAddPatient}
         />
       )}
     </div>
